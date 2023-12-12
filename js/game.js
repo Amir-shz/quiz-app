@@ -4,12 +4,19 @@ const loader = document.getElementById("loader");
 const container = document.getElementById("container");
 const questionText = document.getElementById("question-text");
 const answerList = document.querySelectorAll(".answer-text");
+const scoreText = document.getElementById("score");
+const nextButton = document.getElementById("next-button");
+const questionNumber = document.getElementById("question-number");
 
+const CORRECT_BONUS = 10;
 const URL =
   "https://opentdb.com/api.php?amount=10&difficulty=medium&type=multiple";
+
 let formattedData = null;
 let questionIndex = 0;
 let correctAnswer = null;
+let score = 0;
+let isAccepted = true;
 
 const fetchData = async () => {
   const response = await fetch(URL);
@@ -25,6 +32,7 @@ const start = () => {
 };
 
 const showQuestion = () => {
+  questionNumber.innerText = questionIndex + 1;
   const { answers, question, correctAnswerIndex } =
     formattedData[questionIndex];
   correctAnswer = correctAnswerIndex;
@@ -34,4 +42,44 @@ const showQuestion = () => {
   });
 };
 
+const checkAnswer = (event, index) => {
+  if (!isAccepted) return;
+  isAccepted = false;
+
+  const isCorrect = index === correctAnswer ? true : false;
+  if (isCorrect) {
+    event.target.classList.add("correct");
+    score += CORRECT_BONUS;
+    scoreText.innerText = score;
+  } else {
+    event.target.classList.add("incorrect");
+    answerList[correctAnswer].classList.add("correct");
+  }
+};
+
+const nextHandler = () => {
+  if (questionIndex < formattedData.length - 1) {
+    questionIndex++;
+    isAccepted = true;
+    removeClasses();
+    showQuestion();
+  } else {
+    window.location.assign("../end.html");
+  }
+};
+
+const removeClasses = () => {
+  answerList.forEach((item) => {
+    item.classList.remove("incorrect", "correct");
+  });
+};
+
 window.addEventListener("load", fetchData);
+nextButton.addEventListener("click", nextHandler);
+answerList.forEach((item, index) => {
+  // const handler = () => {
+  //   checkAnswer(index);
+  // };
+  // item.addEventListener("click", handler);
+  item.addEventListener("click", (event) => checkAnswer(event, index));
+});
