@@ -6,11 +6,12 @@ const questionText = document.getElementById("question-text");
 const answerList = document.querySelectorAll(".answer-text");
 const scoreText = document.getElementById("score");
 const nextButton = document.getElementById("next-button");
+const finishButton = document.getElementById("finish-button");
 const questionNumber = document.getElementById("question-number");
 
 const CORRECT_BONUS = 10;
 const URL =
-  "https://opentdb.com/api.php?amount=10&difficulty=medium&type=multiple";
+  "https://opentdb.com/api.php?amount=10&difficulty=easy&type=multiple";
 
 let formattedData = null;
 let questionIndex = 0;
@@ -64,7 +65,7 @@ const nextHandler = () => {
     removeClasses();
     showQuestion();
   } else {
-    window.location.assign("../end.html");
+    finishHandler();
   }
 };
 
@@ -74,8 +75,14 @@ const removeClasses = () => {
   });
 };
 
+const finishHandler = () => {
+  localStorage.setItem("score", JSON.stringify(score));
+  window.location.assign("../end.html");
+};
+
 window.addEventListener("load", fetchData);
 nextButton.addEventListener("click", nextHandler);
+finishButton.addEventListener("click", finishHandler);
 answerList.forEach((item, index) => {
   // const handler = () => {
   //   checkAnswer(index);
